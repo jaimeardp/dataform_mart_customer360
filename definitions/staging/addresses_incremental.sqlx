@@ -1,0 +1,15 @@
+config {
+  type: "incremental",
+  uniqueKey: ["customer_id"],
+  schema: "customer360_staging",
+  tags: ["cdc", "addresses"],
+  partitionBy: "DATE(updated_at)"
+}
+
+SELECT *
+FROM customer360_raw.addresses_stg
+WHERE is_deleted = FALSE
+${when(
+  incremental(),
+  `AND updated_at > (SELECT MAX(updated_at) FROM ${self()})`
+)}

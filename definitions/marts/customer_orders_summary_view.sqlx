@@ -1,0 +1,15 @@
+config {
+  type: "view",
+  schema: "customer360_analytics",
+  tags: ["orders", "summary", "view"],
+  columns: orders_summary_columns.columns
+}
+
+SELECT
+  customer_id,
+  COUNT(*) AS total_orders,
+  SUM(total_amount) AS total_spent,
+  AVG(total_amount) AS avg_order_value,
+  MAX(order_date) AS last_order_date
+FROM customer360_raw.orders_stg
+GROUP BY customer_id

@@ -1,0 +1,28 @@
+config {
+  type: "incremental",
+  uniqueKey: ["customer_id"],
+  schema: "customer360_analytics",
+  tags: ["customer360"],
+  partitionBy: "DATE(updated_at)",
+  columns: customer_360_columns.columns
+
+}
+
+SELECT
+  c.customer_id,
+  c.full_name,
+  a.city,
+  a.state,
+  a.country,
+  o.total_orders,
+  o.last_order_date,
+  act.last_interaction,
+  c.updated_at
+FROM
+  ${ref("customers_incremental")} c
+LEFT JOIN
+  ${ref("addresses_incremental")} a ON c.customer_id = a.customer_id
+LEFT JOIN
+  ${ref("orders_agg_incremental")} o ON c.customer_id = o.customer_id
+LEFT JOIN
+  ${ref("activity_agg_incremental")} act ON c.customer_id = act.customer_id

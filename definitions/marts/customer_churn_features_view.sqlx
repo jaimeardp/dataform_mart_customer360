@@ -1,0 +1,21 @@
+config {
+  type: "view",
+  schema: "customer360_analytics",
+  tags: ["churn", "features", "view"],
+  columns: churn_features_columns.columns
+
+}
+
+SELECT
+  c.customer_id,
+  o.total_orders,
+  o.last_order_date,
+  act.last_interaction,
+  DATE_DIFF(CURRENT_DATE(), o.last_order_date, DAY) AS days_since_last_order,
+  DATE_DIFF(CURRENT_DATE(), act.last_interaction, DAY) AS days_since_last_interaction
+FROM
+  ${ref("customer_360")} c
+LEFT JOIN
+  ${ref("orders_agg_incremental")} o ON c.customer_id = o.customer_id
+LEFT JOIN
+  ${ref("activity_agg_incremental")} act ON c.customer_id = act.customer_id

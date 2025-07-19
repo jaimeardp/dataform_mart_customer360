@@ -1,0 +1,18 @@
+config {
+  type: "incremental",
+  uniqueKey: ["customer_id"],
+  schema: "customer360_staging",
+  tags: ["activity", "agg"],
+  partitionBy: "last_interaction"
+}
+
+SELECT
+  customer_id,
+  CAST(MAX(interaction_date) AS DATE)  AS last_interaction
+FROM customer360_raw.customer_activity_stg
+${when(
+  incremental(),
+  `WHERE interaction_date > (SELECT MAX(last_interaction) FROM ${self()})`,
+  `WHERE TRUE`
+)}
+GROUP BY customer_id

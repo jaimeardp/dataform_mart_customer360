@@ -1,0 +1,19 @@
+config {
+  type: "incremental",
+  uniqueKey: ["customer_id"],
+  schema: "customer360_staging",
+  tags: ["orders", "agg"],
+  partitionBy: "last_order_date"
+}
+
+SELECT
+  customer_id,
+  COUNT(*) AS total_orders,
+  CAST(MAX(order_date) AS DATE)  AS last_order_date
+FROM customer360_raw.orders_stg
+${when(
+  incremental(),
+  `WHERE order_date > (SELECT MAX(last_order_date) FROM ${self()})`,
+  `WHERE TRUE`
+)}
+GROUP BY customer_id

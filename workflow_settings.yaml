@@ -1,0 +1,5 @@
+dataformCoreVersion: 3.0.22
+defaultProject: oceanic-student-465214-j2
+defaultLocation: us
+defaultDataset: dataform
+defaultAssertionDataset: dataform_assertions
